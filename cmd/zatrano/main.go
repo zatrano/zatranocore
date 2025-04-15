@@ -16,7 +16,6 @@ import (
 )
 
 func main() {
-
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -36,18 +35,11 @@ func main() {
 
 	app.Static("/", "./public")
 
-	setupMiddlewares(app)
+	app.Use(configs.SetupCSRF())
 
 	routes.SetupRoutes(app, configs.GetDB())
 
 	startServer(app)
-}
-
-func setupMiddlewares(app *fiber.App) {
-	app.Use(configs.SetupCSRF())
-	app.Use(func(c *fiber.Ctx) error {
-		return c.Next()
-	})
 }
 
 func startServer(app *fiber.App) {
