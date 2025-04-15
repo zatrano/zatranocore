@@ -21,6 +21,7 @@ func main() {
 	}
 
 	configs.InitDB()
+
 	defer configs.CloseDB()
 
 	configs.InitSession()
@@ -28,6 +29,8 @@ func main() {
 	engine := html.New("./views", ".html")
 
 	engine.AddFunc("getFlashMessages", utils.GetFlashMessages)
+
+	engine.AddFuncMap(utils.TemplateHelpers())
 
 	app := fiber.New(fiber.Config{
 		Views: engine,
@@ -45,6 +48,7 @@ func main() {
 func startServer(app *fiber.App) {
 
 	shutdown := make(chan os.Signal, 1)
+
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 
 	go func() {

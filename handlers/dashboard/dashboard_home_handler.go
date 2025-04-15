@@ -1,13 +1,12 @@
 package handlers
 
 import (
-	"log"           // Hata loglama için log paketini ekleyin
-	"zatrano/utils" // Utils paketini import et
+	"log"
+	"zatrano/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-// HomeHandler dashboard ana sayfasını işler ve flash mesajları gösterir
 func HomeHandler(c *fiber.Ctx) error {
 	// Flash mesajlarını al
 	flashData, err := utils.GetFlashMessages(c)
@@ -18,7 +17,7 @@ func HomeHandler(c *fiber.Ctx) error {
 
 	// Render edilecek verileri hazırla (Flash mesajlarını ekle)
 	renderData := fiber.Map{
-		"Title": "Gösterge Paneli Ana Sayfa",
+		"Title": "Dashboard",
 		// Flash mesajlarını şablona gönder
 		"Success": flashData.Success,
 		"Error":   flashData.Error,

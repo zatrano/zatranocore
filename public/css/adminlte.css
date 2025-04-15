@@ -13886,7 +13886,14 @@ body:not(.app-loaded) .app-footer {
   background-color: var(--bs-body-bg);
   border-top: 1px solid var(--bs-border-color);
   transition: 0.3s ease-in-out;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  flex-direction: column;
 }
+
 @media (prefers-reduced-motion: reduce) {
   .app-footer {
     transition: none;
@@ -13910,8 +13917,8 @@ body:not(.app-loaded) .app-footer {
 }
 
 .dropdown-menu-lg {
-  min-width: 280px;
-  max-width: 300px;
+  min-width: 175px;
+  max-width: 175px;
   padding: 0;
 }
 .dropdown-menu-lg .dropdown-divider {
