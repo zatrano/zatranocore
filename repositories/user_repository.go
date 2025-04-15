@@ -47,3 +47,10 @@ func (r *UserRepository) Update(user *models.User) error {
 func (r *UserRepository) Delete(id uint) error {
 	return r.db.Delete(&models.User{}, id).Error
 }
+
+func (r *UserRepository) Count() (int64, error) {
+	var count int64
+	// Model belirterek user tablosundaki kayıtları say
+	err := r.db.Model(&models.User{}).Count(&count).Error
+	return count, err
+}

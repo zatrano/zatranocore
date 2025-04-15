@@ -1,6 +1,7 @@
 package services
 
 import (
+	"log"
 	"zatrano/models"
 	"zatrano/repositories"
 )
@@ -39,4 +40,14 @@ func (s *TeamService) UpdateTeam(id uint, teamData *models.Team) error {
 
 func (s *TeamService) DeleteTeam(id uint) error {
 	return s.repo.Delete(id)
+}
+
+func (s *TeamService) GetTeamCount() (int64, error) {
+	count, err := s.repo.Count()
+	if err != nil {
+		log.Printf("TeamService: Error getting team count from repository: %v", err)
+		// Hata yönetimi: 0 döndür ve logla veya hatayı yukarı ilet. Şimdilik iletiyoruz.
+		return 0, err
+	}
+	return count, nil
 }

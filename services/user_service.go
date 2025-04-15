@@ -1,6 +1,7 @@
 package services
 
 import (
+	"log"
 	"zatrano/models"
 	"zatrano/repositories"
 )
@@ -51,4 +52,15 @@ func (s *UserService) UpdateUser(id uint, userData *models.User) error {
 
 func (s *UserService) DeleteUser(id uint) error {
 	return s.repo.Delete(id)
+}
+
+func (s *UserService) GetUserCount() (int64, error) {
+	count, err := s.repo.Count()
+	if err != nil {
+		log.Printf("UserService: Error getting user count from repository: %v", err)
+		// Belki burada 0 döndürmek ve hatayı loglamak yeterlidir,
+		// ya da hatayı yukarıya iletmek. Şimdilik iletiyoruz.
+		return 0, err
+	}
+	return count, nil
 }

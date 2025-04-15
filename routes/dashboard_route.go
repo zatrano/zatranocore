@@ -17,7 +17,8 @@ func registerDashboardRoutes(app *fiber.App) {
 	)
 
 	// Ana sayfa
-	dashboardGroup.Get("/home", handlers.HomeHandler)
+	homeHandler := handlers.NewHomeHandler()
+	dashboardGroup.Get("/home", homeHandler.HomePage)
 
 	// Takım yönetimi - Yeni yapıya uygun
 	teamHandler := handlers.NewTeamHandler()

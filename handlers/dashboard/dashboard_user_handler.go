@@ -11,13 +11,13 @@ import (
 )
 
 type UserHandler struct {
-	service     *services.UserService
+	userService *services.UserService
 	teamService *services.TeamService
 }
 
 func NewUserHandler() *UserHandler {
 	return &UserHandler{
-		service:     services.NewUserService(),
+		userService: services.NewUserService(),
 		teamService: services.NewTeamService(),
 	}
 }
@@ -29,7 +29,7 @@ func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
 		log.Printf("ListUsers: Flash mesajları alınamadı: %v", flashErr)
 	}
 
-	users, dbErr := h.service.GetAllUsers() // Veritabanından kullanıcıları al
+	users, dbErr := h.userService.GetAllUsers() // Veritabanından kullanıcıları al
 
 	// Render edilecek temel verileri hazırla
 	renderData := fiber.Map{
@@ -59,8 +59,6 @@ func (h *UserHandler) ListUsers(c *fiber.Ctx) error {
 }
 
 func (h *UserHandler) ShowCreateUser(c *fiber.Ctx) error {
-	// Bu fonksiyon GetFlashMessages kullanmıyor, değişiklik gerekmez.
-	// Ancak, eğer bu sayfada da flash mesaj göstermek isterseniz, ListUsers'daki gibi ekleyebilirsiniz.
 	teams, err := h.teamService.GetAllTeams()
 	mapData := fiber.Map{
 		"Title":     "Yeni Kullanıcı Ekle",
@@ -74,10 +72,6 @@ func (h *UserHandler) ShowCreateUser(c *fiber.Ctx) error {
 	} else {
 		mapData["Teams"] = teams
 	}
-
-	// successFlash, errorFlash := utils.GetFlashMessages(c) // İsterseniz eklenebilir
-	// mapData["Success"] = successFlash
-	// mapData["Error"] = errorFlash // Veya mevcut hatayla birleştir
 
 	return c.Render("dashboard/users/dashboard_users_create", mapData, "layouts/dashboard_layout")
 }
@@ -154,7 +148,7 @@ func (h *UserHandler) CreateUser(c *fiber.Ctx) error {
 	}
 
 	// Kullanıcıyı veritabanına kaydet
-	if err := h.service.CreateUser(&user); err != nil {
+	if err := h.userService.CreateUser(&user); err != nil {
 		log.Printf("CreateUser DB Error: %v", err)
 		// Hata mesajını daha spesifik hale getirebiliriz (örn: duplicate account)
 		return h.renderCreateUserFormWithError(c, "Kullanıcı oluşturulamadı (örn: hesap adı zaten mevcut olabilir).", fiber.StatusInternalServerError, req)
@@ -173,7 +167,7 @@ func (h *UserHandler) ShowUpdateUser(c *fiber.Ctx) error {
 		return c.Redirect("/dashboard/users", fiber.StatusSeeOther)
 	}
 
-	user, err := h.service.GetUserByID(uint(id))
+	user, err := h.userService.GetUserByID(uint(id))
 	if err != nil {
 		_ = utils.SetFlashMessage(c, utils.FlashErrorKey, "Kullanıcı bulunamadı.")
 		return c.Redirect("/dashboard/users", fiber.StatusSeeOther)
@@ -210,7 +204,7 @@ func (h *UserHandler) ShowUpdateUser(c *fiber.Ctx) error {
 // renderUpdateUserFormWithError GetFlashMessages kullanmıyor, doğrudan Error parametresi alıyor. Değişiklik gerekmez.
 func (h *UserHandler) renderUpdateUserFormWithError(c *fiber.Ctx, userID uint, errorMsg string, statusCode int, formData interface{}) error {
 	// Bu yardımcı fonksiyon, formu hata mesajı ve önceki verilerle tekrar render eder.
-	user, userErr := h.service.GetUserByID(userID)
+	user, userErr := h.userService.GetUserByID(userID)
 	if userErr != nil {
 		// Kullanıcı bile yüklenemiyorsa ana listeye yönlendir.
 		log.Printf("renderUpdateUserFormWithError: Kullanıcı %d yüklenemedi: %v", userID, userErr)
@@ -286,7 +280,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	// else { teamID nil kalır }
 
 	// Mevcut kullanıcıyı bul
-	existingUser, err := h.service.GetUserByID(userID)
+	existingUser, err := h.userService.GetUserByID(userID)
 	if err != nil {
 		_ = utils.SetFlashMessage(c, utils.FlashErrorKey, "Güncellenecek kullanıcı bulunamadı.")
 		return c.Redirect("/dashboard/users", fiber.StatusSeeOther)
@@ -309,7 +303,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 	// else { Şifre değişmez }
 
 	// Kullanıcıyı veritabanında güncelle
-	if err := h.service.UpdateUser(userID, existingUser); err != nil {
+	if err := h.userService.UpdateUser(userID, existingUser); err != nil {
 		log.Printf("UpdateUser DB Error (UserID: %d): %v", userID, err)
 		// Hata mesajını daha spesifik hale getir
 		return h.renderUpdateUserFormWithError(c, userID, "Kullanıcı güncellenemedi (örn: hesap adı zaten mevcut olabilir).", fiber.StatusInternalServerError, req)
@@ -329,7 +323,7 @@ func (h *UserHandler) DeleteUser(c *fiber.Ctx) error {
 	}
 	userID := uint(id)
 
-	if err := h.service.DeleteUser(userID); err != nil {
+	if err := h.userService.DeleteUser(userID); err != nil {
 		log.Printf("DeleteUser Error (UserID: %d): %v", userID, err)
 		_ = utils.SetFlashMessage(c, utils.FlashErrorKey, "Kullanıcı silinemedi.") // Genel hata
 		return c.Redirect("/dashboard/users", fiber.StatusSeeOther)

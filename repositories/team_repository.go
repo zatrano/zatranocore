@@ -38,3 +38,10 @@ func (r *TeamRepository) Update(team *models.Team) error {
 func (r *TeamRepository) Delete(id uint) error {
 	return r.db.Delete(&models.Team{}, id).Error
 }
+
+func (r *TeamRepository) Count() (int64, error) {
+	var count int64
+	// Model belirterek team tablosundaki kayıtları say
+	err := r.db.Model(&models.Team{}).Count(&count).Error
+	return count, err
+}

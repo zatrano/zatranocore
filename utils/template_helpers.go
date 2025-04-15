@@ -8,7 +8,7 @@ import (
 // TemplateFuncs tüm template fonksiyonlarını döner
 func TemplateHelpers() template.FuncMap {
 	return template.FuncMap{
-		"currentYear": func() int {
+		"CurrentYear": func() int {
 			return time.Now().Year()
 		},
 		// başka fonksiyonlar da buraya eklenebilir
