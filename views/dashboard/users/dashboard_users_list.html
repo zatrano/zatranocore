@@ -1,0 +1,110 @@
+<!--begin::Container-->
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h3 class="card-title mb-0"><strong>{{.Title}}</strong></h3>
+            <div class="float-end">
+              <a href="/dashboard/users/create" class="btn btn-sm btn-success">
+                <i class="bi bi-plus"></i> Yeni Ekle
+              </a>
+            </div>
+          </div>
+        </div>
+        <!-- /.card-header -->
+        <div class="card-body">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Ad Soyad</th>
+                <th>Hesap</th>
+                <th>Kullanıcı Tipi</th>
+                <th>Durum</th>
+                <th>İşlemler</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{if .Users}}
+                {{range .Users}}
+                <tr>
+                  <td>{{.ID}}</td>
+                  <td>{{.Name}}</td>
+                  <td>{{.Account}}</td>
+                  <td>{{.Type}}</td>
+                  <td>
+                    {{if .Status}}
+                      <span class="badge text-bg-success">Aktif</span>
+                    {{else}}
+                      <span class="badge text-bg-secondary">Pasif</span>
+                    {{end}}
+                  </td>
+                  <td>
+                    <a href="/dashboard/users/update/{{.ID}}" class="btn btn-sm btn-primary me-1">
+                      <i class="bi bi-pencil"></i> Düzenle
+                    </a>
+                    <form id="deleteForm-{{.ID}}" action="/dashboard/users/delete/{{.ID}}" method="POST" class="d-inline">
+                      <input type="hidden" name="_method" value="DELETE">
+                      {{if $.CsrfToken}}
+                      <input type="hidden" name="csrf_token" value="{{$.CsrfToken}}">
+                      {{end}}
+                      <button type="button" 
+                              onclick="confirmDelete('{{.ID}}')" 
+                              class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Sil
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+                {{end}}
+              {{else}}
+                <tr>
+                  <td colspan="6" class="text-center py-4">
+                    <div class="text-muted">Kayıt bulunamadı</div>
+                  </td>
+                </tr>
+              {{end}}
+            </tbody>
+          </table>
+        </div>
+        <!-- /.card-body -->
+        <div class="card-footer clearfix">
+          <ul class="pagination pagination-sm m-0 justify-content-center">
+            <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+          </ul>
+        </div>
+      </div>
+      <!-- /.card -->
+    </div>
+    <!-- /.col -->
+  </div>
+  <!-- /.row -->
+</div>
+<!--end::Container-->
+
+<script>
+  // Silme işlemini onaylamak için fonksiyon
+  function confirmDelete(id) {
+    Swal.fire({
+      title: 'Emin misiniz?',
+      text: "Bu kullanıcıyı silmek istediğinize emin misiniz?",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Evet, sil!',
+      cancelButtonText: 'İptal'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // Formu submit et
+        document.getElementById(`deleteForm-${id}`).submit();
+      }
+    });
+  }
+  </script>
